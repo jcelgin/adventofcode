@@ -1,1 +1,1 @@
-adventofcode
+Playing along with [Advent of Code](https://adventofcode.com/).
