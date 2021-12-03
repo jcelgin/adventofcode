@@ -29,23 +29,14 @@ foreach (var line in lines)
 
 var majorityThreshold = lines.Length / 2;
 char[] epsilonBits = new char[bitsPerLine];
-char[] gammaBits = new char[bitsPerLine];
 
 for (var i = 0; i < bitsPerLine; i++)
 {
-    if (onesPerBit[i] > majorityThreshold)
-    {
-        epsilonBits[i] = '1';
-        gammaBits[i] = '0';
-    }
-    else
-    {
-        epsilonBits[i] = '0';
-        gammaBits[i] = '1';
-    }
+    epsilonBits[i] = onesPerBit[i] > majorityThreshold ? '1' : '0';
 }
 
 var epsilon = Convert.ToInt16(new string(epsilonBits), 2);
-var gamma = Convert.ToInt16(new string(gammaBits), 2);
+var epsilonInvertedBits = Convert.ToString(~epsilon, 2).Remove(0, 32 - bitsPerLine);
+var gamma = Convert.ToInt16(epsilonInvertedBits, 2);
 
 Console.WriteLine($"epsilon: {epsilon}, gamma: {gamma}, product: {epsilon*gamma}");
