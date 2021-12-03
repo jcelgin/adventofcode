@@ -10,42 +10,33 @@ if (!File.Exists(filePath))
     throw new FileNotFoundException(filePath);
 }
 
-var lines = await File.ReadAllLinesAsync(args[0]);
+var lines = await File.ReadAllLinesAsync(filePath);
 
-var x = 0;
-var y = 0;
-var aim = 0;
+var bitsPerLine = lines.First().Length;
+
+int[] onesPerBit = new int[bitsPerLine];
 
 foreach (var line in lines)
 {
-    var tokens = line.Split(' ');
-    if (tokens.Length != 2)
+    for(var i = 0; i < onesPerBit.Length; i++)
     {
-        throw new Exception($"Expected two tokens, received {tokens.Length} for input `{line}`");
-    }
-
-    var direction = tokens[0]; 
-
-    if (!int.TryParse(tokens[1], out var magnitude))
-    {
-        throw new Exception($"Unable to parse `{tokens[1]}` to int.");
-    }
-
-    switch (direction.ToLower())
-    {
-        case "forward":
-            x += magnitude;
-            y += aim * magnitude;
-            break;
-        case "up":
-            aim -= magnitude;
-            break;
-        case "down":
-            aim += magnitude;
-            break;
-        default:
-            throw new ArgumentOutOfRangeException($"Unexpected direction `{direction}`");
+        if (line[i] == '1')
+        {
+            onesPerBit[i]++;
+        }
     }
 }
 
-Console.WriteLine($"{x}, {y}: {x*y}");
+var majorityThreshold = lines.Length / 2;
+char[] epsilonBits = new char[bitsPerLine];
+
+for (var i = 0; i < bitsPerLine; i++)
+{
+    epsilonBits[i] = onesPerBit[i] > majorityThreshold ? '1' : '0';
+}
+
+var epsilon = Convert.ToInt16(new string(epsilonBits), 2);
+var epsilonInvertedBits = Convert.ToString(~epsilon, 2).Remove(0, 32 - bitsPerLine);
+var gamma = Convert.ToInt16(epsilonInvertedBits, 2);
+
+Console.WriteLine($"epsilon: {epsilon}, gamma: {gamma}, product: {epsilon*gamma}");
