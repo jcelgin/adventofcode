@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DepthCounter": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\repos\\adventofcode\\2021\\3\\testinput.txt"
+    }
+  }
+}
