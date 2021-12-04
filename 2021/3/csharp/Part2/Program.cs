@@ -14,61 +14,54 @@ var lines = await File.ReadAllLinesAsync(filePath);
 
 var bitsPerLine = lines.First().Length;
 
-
-Tuple<IGrouping<char, string>, IGrouping<char, string>> DetermineMajorVsMinor(IEnumerable<string> liiiiines, int i)
+Tuple<IEnumerable<string>, IEnumerable<string>> DetermineMajorVsMinor(IEnumerable<string> inputLines, int i)
 {
-    var bitGroups = liiiiines.GroupBy(x => x[i]);
-    var majorityThreshold = liiiiines.Count() / 2;
+    var bitGroups = inputLines.GroupBy(x => x[i]);
+    var majorityThreshold = inputLines.Count() / 2;
 
     var majorityGroups = bitGroups.Where(x => x.Count() > majorityThreshold);
 
-    IGrouping<char, string> oxGroup;
+    IGrouping<char, string> majorGroup;
     if (!majorityGroups.Any())
     {
-        oxGroup = bitGroups.First(x => x.Key == '1');
+        majorGroup = bitGroups.First(x => x.Key == '1');
     }
     else
     {
-        oxGroup = majorityGroups.Single();
+        majorGroup = majorityGroups.Single();
     }
 
-    var co2Group = bitGroups.First(x => x.Key != oxGroup.Key);
+    var minorGroup = bitGroups.First(x => x.Key != majorGroup.Key);
 
-    return new Tuple<IGrouping<char, string>, IGrouping<char, string>>(oxGroup, co2Group);
+    return new Tuple<IEnumerable<string>, IEnumerable<string>>(majorGroup.ToArray(), minorGroup.ToArray());
 }
 
 var majorBits = new char[bitsPerLine];
 var minorBits = new char[bitsPerLine];
 
-var (major, minor) = DetermineMajorVsMinor(lines, 0);
-
-var majorLines = major.ToArray();
-var minorLines = minor.ToArray();
+IEnumerable<string> majorLines = lines;
+IEnumerable<string> minorLines = lines;
 
 string? majorValueBinaryString = null;
 string? minorValueBinaryString = null;
 
-for (var i = 1; i < bitsPerLine; i++)
+for (var i = 0; i < bitsPerLine; i++)
 {
     if (majorValueBinaryString == null)
     {
-        var (majorResult, _) = DetermineMajorVsMinor(majorLines, i);
-        majorLines = majorResult.ToArray();
-
-        if (majorLines.Length == 1)
+        (majorLines, _) = DetermineMajorVsMinor(majorLines, i);
+        if (majorLines.Count() == 1)
         {
-            majorValueBinaryString = majorLines[0];
+            majorValueBinaryString = majorLines.Single();
         }
     }
 
     if (minorValueBinaryString == null)
     {
-        var (_, minorResult) = DetermineMajorVsMinor(minorLines, i);
-        minorLines = minorResult.ToArray();
-
-        if (minorLines.Length == 1)
+        (_, minorLines) = DetermineMajorVsMinor(minorLines, i);
+        if (minorLines.Count() == 1)
         {
-            minorValueBinaryString = minorLines[0];
+            minorValueBinaryString = minorLines.Single();
         }
     }
 }
