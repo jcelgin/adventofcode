@@ -14,29 +14,68 @@ var lines = await File.ReadAllLinesAsync(filePath);
 
 var bitsPerLine = lines.First().Length;
 
-int[] onesPerBit = new int[bitsPerLine];
 
-foreach (var line in lines)
+Tuple<IGrouping<char, string>, IGrouping<char, string>> DetermineMajorVsMinor(IEnumerable<string> liiiiines, int i)
 {
-    for(var i = 0; i < onesPerBit.Length; i++)
+    var bitGroups = liiiiines.GroupBy(x => x[i]);
+    var majorityThreshold = liiiiines.Count() / 2;
+
+    var majorityGroups = bitGroups.Where(x => x.Count() > majorityThreshold);
+
+    IGrouping<char, string> oxGroup;
+    if (!majorityGroups.Any())
     {
-        if (line[i] == '1')
+        oxGroup = bitGroups.First(x => x.Key == '1');
+    }
+    else
+    {
+        oxGroup = majorityGroups.Single();
+    }
+
+    var co2Group = bitGroups.First(x => x.Key != oxGroup.Key);
+
+    return new Tuple<IGrouping<char, string>, IGrouping<char, string>>(oxGroup, co2Group);
+}
+
+var majorBits = new char[bitsPerLine];
+var minorBits = new char[bitsPerLine];
+
+var (major, minor) = DetermineMajorVsMinor(lines, 0);
+
+var majorLines = major.ToArray();
+var minorLines = minor.ToArray();
+
+string? majorValueBinaryString = null;
+string? minorValueBinaryString = null;
+
+for (var i = 1; i < bitsPerLine; i++)
+{
+    if (majorValueBinaryString == null)
+    {
+        var (majorResult, _) = DetermineMajorVsMinor(majorLines, i);
+        majorLines = majorResult.ToArray();
+
+        if (majorLines.Length == 1)
         {
-            onesPerBit[i]++;
+            majorValueBinaryString = majorLines[0];
+        }
+    }
+
+    if (minorValueBinaryString == null)
+    {
+        var (_, minorResult) = DetermineMajorVsMinor(minorLines, i);
+        minorLines = minorResult.ToArray();
+
+        if (minorLines.Length == 1)
+        {
+            minorValueBinaryString = minorLines[0];
         }
     }
 }
 
-var majorityThreshold = lines.Length / 2;
-char[] epsilonBits = new char[bitsPerLine];
+var majorValue = Convert.ToInt32(majorValueBinaryString, 2);
+var minorValue = Convert.ToInt32(minorValueBinaryString, 2);
 
-for (var i = 0; i < bitsPerLine; i++)
-{
-    epsilonBits[i] = onesPerBit[i] > majorityThreshold ? '1' : '0';
-}
-
-var epsilon = Convert.ToInt16(new string(epsilonBits), 2);
-var epsilonInvertedBits = Convert.ToString(~epsilon, 2).Remove(0, 32 - bitsPerLine);
-var gamma = Convert.ToInt16(epsilonInvertedBits, 2);
-
-Console.WriteLine($"epsilon: {epsilon}, gamma: {gamma}, product: {epsilon*gamma}");
+Console.WriteLine($"majorValue: {majorValueBinaryString} ({majorValue}), " +
+    $"minorValue: {minorValueBinaryString} ({minorValue}), " +
+    $"product: {majorValue * minorValue}");
