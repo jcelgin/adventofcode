@@ -33,37 +33,15 @@ foreach(var line in lines)
 
     if (c0.X == c1.X)
     {
-        var length = c1.Y - c0.Y;
-        if (length < 0)
-        {
-            var cTemp = c0;
-            c0 = c1;
-            c1 = cTemp;
-            length *= -1;
-        }
-
-        markedCoords = new Coorindate[length+1];
-        for(var i = 0; i <= length; i++)
-        {
-            markedCoords[i] = new Coorindate(c0.X, c0.Y + i);
-        }
+        markedCoords = GetNumbersInRangeInclusive(c0.Y, c1.Y)
+            .Select(y => new Coorindate(c0.X, y))
+            .ToArray();
     }
     else if (c0.Y == c1.Y)
     {
-        var length = c1.X - c0.X;
-        if (length < 0)
-        {
-            var cTemp = c0;
-            c0 = c1;
-            c1 = cTemp;
-            length *= -1;
-        }
-
-        markedCoords = new Coorindate[length+1];
-        for (var i = 0; i <= length; i++)
-        {
-            markedCoords[i] = new Coorindate(c0.X + i, c0.Y);
-        }
+        markedCoords = GetNumbersInRangeInclusive(c0.X, c1.X)
+            .Select(x => new Coorindate(x, c0.Y))
+            .ToArray();
     }
     else
     {
@@ -84,8 +62,16 @@ foreach(var line in lines)
     }
 }
 
-var result = map.Aggregate(0, (sum, entry) =>
-    entry.Value > 1 ? sum+1 : sum
-);
+var result = map.Aggregate(0, (sum, entry) => entry.Value > 1 ? sum + 1 : sum);
 
 Console.WriteLine($"Dangerous positions: {result}");
+
+IEnumerable<int> GetNumbersInRangeInclusive(int start, int end)
+{
+    if (start > end)
+    {
+        return GetNumbersInRangeInclusive(end, start).Reverse();
+    }
+
+    return Enumerable.Range(start, end - start + 1);
+}
