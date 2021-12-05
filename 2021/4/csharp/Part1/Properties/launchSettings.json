@@ -2,7 +2,7 @@
   "profiles": {
     "DepthCounter": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\repos\\adventofcode\\2021\\4\\testinput.txt"
+      "commandLineArgs": "C:\\repos\\adventofcode\\2021\\4\\realinput.txt"
     }
   }
 }
