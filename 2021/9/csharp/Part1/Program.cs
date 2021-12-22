@@ -73,8 +73,6 @@ for (var i = 0; i < numLines; i++)
     }
 }
 
-
-// TODO
 var result = localMinima.Sum() + localMinima.Count;
 
 Console.WriteLine($"Result: {result}");
