@@ -14,4 +14,5 @@ var lines = await File.ReadAllLinesAsync(filePath);
 
 // TODO
 
+var result = "We ain't done yet";
 Console.WriteLine($"Result: {result}");
