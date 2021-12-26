@@ -17,7 +17,7 @@ foreach (var line in lines)
 {
     Console.WriteLine(line);
     var stack = new Stack<char>();
-    var escape = false;
+    var corrupted = false;
     foreach (var token in line.ToCharArray())
     {
         switch (token)
@@ -43,19 +43,19 @@ foreach (var line in lines)
                 {
                     illegalChars.Add(token);
                     Console.WriteLine($"\tExpected {p}, but found {token} instead");
-                    escape = true;
+                    corrupted = true;
                 }
                 break;
             default:
                 throw new ArgumentOutOfRangeException("adsf");
         }
 
-        if (escape)
+        if (corrupted)
         {
             break;
         }
     }
-    if (!escape)
+    if (!corrupted)
     {
         Console.WriteLine($"\tStack height: {stack.Count}");
     }
