@@ -3,7 +3,7 @@
     throw new ArgumentException($"Expected 1 argument (file path), got {args.Length}");
 }
 
-string filePath = args[0];
+var filePath = args[0];
 
 if (!File.Exists(filePath))
 {
@@ -13,5 +13,6 @@ if (!File.Exists(filePath))
 var lines = await File.ReadAllLinesAsync(filePath);
 
 // TODO
+var result = "TODO";
 
 Console.WriteLine($"Result: {result}");
