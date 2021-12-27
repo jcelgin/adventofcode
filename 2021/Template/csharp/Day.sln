@@ -10,6 +10,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{40E5E2CF-8797-4D1D-AF68-36FC09DADA34}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		..\input.real.txt = ..\input.real.txt
+		..\input.test.txt = ..\input.test.txt
+		..\readme.md = ..\readme.md
 	EndProjectSection
 EndProject
 Global
