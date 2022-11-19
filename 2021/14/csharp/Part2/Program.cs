@@ -53,7 +53,7 @@ if (!File.Exists(filePath))
 
 var lines = await File.ReadAllLinesAsync(filePath);
 
-var pattern = lines[0];//.Substring(0,2);
+var pattern = lines[0];
 
 var mutations = new Dictionary<string, char>();
 for (var i = 2; i < lines.Length; i++)
@@ -78,15 +78,15 @@ for (var i = 1; i < pattern.Length; i++)
 }
 
 result[pattern.Last()]++;
+Console.Beep();
 
-var k = result.OrderBy(x => x.Value).ToArray();
+var orderedResult = result.OrderBy(x => x.Value).ToArray();
 
-foreach (var m in k)
+foreach (var m in orderedResult)
 {  
     Console.WriteLine($"{m.Key}: {m.Value}");
 }
 
-var diff = k.Last().Value - k.First().Value;
+var diff = orderedResult.Last().Value - orderedResult.First().Value;
 
 Console.WriteLine($"Diff: {diff}");
-;
