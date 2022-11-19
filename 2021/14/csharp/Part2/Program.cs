@@ -21,14 +21,11 @@ Dictionary<char, long> RecursiveNightmare(int numSteps, char c0, char c1, IReadO
 {
     var interstitialChar = mutations[new string(new ReadOnlySpan<char>(new[] { c0, c1 }))];
 
-    if (numSteps <= 1)
+    if (numSteps == 1)
     {
-//        Console.WriteLine($"Counting {c0}, {interstitialChar}");
-        var recursiveNightmare = new[] { c0, interstitialChar }
-            .GroupBy(x => x)
-            .ToDictionary(x => x.Key, x => (long)x.Count());
-
-        return recursiveNightmare;
+        return interstitialChar == c0
+            ? new Dictionary<char, long> { { c0, 2 } }
+            : new Dictionary<char, long> { { c0, 1 }, { interstitialChar, 1 } };
     }
 
 //    Console.WriteLine($"{c0}{c1} =>  {interstitialChar}");
@@ -62,7 +59,7 @@ for (var i = 2; i < lines.Length; i++)
     mutations.Add(tokens[0], tokens[1][0]);
 }
 
-const int numTransformations = 40;
+const int numTransformations = 25;
 
 var result = new Dictionary<char, long>();
 
@@ -75,10 +72,10 @@ for (var i = 1; i < pattern.Length; i++)
     result = CombineDicts(result, m);
     sw.Stop();
     Console.WriteLine($"Chunk {i}: {sw.ElapsedMilliseconds} ms");
+    Console.Beep();
 }
 
 result[pattern.Last()]++;
-Console.Beep();
 
 var orderedResult = result.OrderBy(x => x.Value).ToArray();
 
