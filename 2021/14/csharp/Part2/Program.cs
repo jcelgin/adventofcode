@@ -1,20 +1,42 @@
 ﻿using System.Diagnostics;
-using System.Text;
 
-string Transform(string s, IReadOnlyDictionary<string, char[]> mutations)
+Dictionary<char, long> CombineDicts(Dictionary<char, long> d1, Dictionary<char, long> d2)
 {
-    var sb = new StringBuilder();
-
-    for (var i = 0; i < s.Length-1; i++)
+    foreach (var entry in d1)
     {
-        var pattern = s.Substring(i, 2);
-        var result = mutations[pattern];
-        sb.Append(result);
+        if (d2.ContainsKey(entry.Key))
+        {
+            d2[entry.Key] += entry.Value;
+        }
+        else
+        {
+            d2.Add(entry.Key, entry.Value);
+        }
     }
 
-    sb.Append(s.Last());
+    return d2;
+}
 
-    return sb.ToString();
+Dictionary<char, long> RecursiveNightmare(int numSteps, char c0, char c1, IReadOnlyDictionary<string, char> mutations)
+{
+    var interstitialChar = mutations[new string(new ReadOnlySpan<char>(new[] { c0, c1 }))];
+
+    if (numSteps <= 1)
+    {
+//        Console.WriteLine($"Counting {c0}, {interstitialChar}");
+        var recursiveNightmare = new[] { c0, interstitialChar }
+            .GroupBy(x => x)
+            .ToDictionary(x => x.Key, x => (long)x.Count());
+
+        return recursiveNightmare;
+    }
+
+//    Console.WriteLine($"{c0}{c1} =>  {interstitialChar}");
+
+    var child0 = RecursiveNightmare(numSteps - 1, c0, interstitialChar, mutations);
+    var child1 = RecursiveNightmare(numSteps - 1, interstitialChar, c1, mutations);
+
+    return CombineDicts(child0, child1);
 }
 
 if (args.Length != 1)
@@ -31,31 +53,40 @@ if (!File.Exists(filePath))
 
 var lines = await File.ReadAllLinesAsync(filePath);
 
-var pattern = lines[0];
+var pattern = lines[0];//.Substring(0,2);
 
-var mutations = new Dictionary<string, char[]>();
+var mutations = new Dictionary<string, char>();
 for (var i = 2; i < lines.Length; i++)
 {
     var tokens = lines[i].Split(" -> ");
-    var value = new[] { tokens[0][0], tokens[1][0] };
-    mutations.Add(tokens[0], value);
+    mutations.Add(tokens[0], tokens[1][0]);
 }
 
-const int numTransformations = 10;
+const int numTransformations = 40;
 
-var result = pattern;
+var result = new Dictionary<char, long>();
 
-for (var i = 0; i < numTransformations; i++)
+for (var i = 1; i < pattern.Length; i++)
 {
     var sw = Stopwatch.StartNew();
-    result = Transform(result, mutations);
+    var c0 = pattern[i - 1];
+    var c1 = pattern[i];
+    var m = RecursiveNightmare(numTransformations, c0, c1, mutations);
+    result = CombineDicts(result, m);
     sw.Stop();
-    Console.WriteLine($"Completed step {i} in {sw.ElapsedMilliseconds}ms");
-    //Console.WriteLine($"{i}: {result}");
+    Console.WriteLine($"Chunk {i}: {sw.ElapsedMilliseconds} ms");
 }
 
-var k = result.GroupBy(x => x).Select(x => new { x.Key, Count = x.Count() }).OrderBy(x => x.Count).ToArray();
+result[pattern.Last()]++;
 
-var diff = k.Last().Count - k.First().Count;
+var k = result.OrderBy(x => x.Value).ToArray();
+
+foreach (var m in k)
+{  
+    Console.WriteLine($"{m.Key}: {m.Value}");
+}
+
+var diff = k.Last().Value - k.First().Value;
 
 Console.WriteLine($"Diff: {diff}");
+;
