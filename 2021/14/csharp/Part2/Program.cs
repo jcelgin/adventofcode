@@ -1,24 +1,31 @@
 ﻿using System.Diagnostics;
 
-Dictionary<char, long> CombineDicts(Dictionary<char, long> d1, Dictionary<char, long> d2)
+Dictionary<char, long> CombineDictionaries(IReadOnlyDictionary<char, long> d1, IReadOnlyDictionary<char, long> d2)
 {
+    var combined = new Dictionary<char, long>(d2);
+
     foreach (var entry in d1)
     {
-        if (d2.ContainsKey(entry.Key))
+        if (!combined.TryAdd(entry.Key, entry.Value))
         {
-            d2[entry.Key] += entry.Value;
-        }
-        else
-        {
-            d2.Add(entry.Key, entry.Value);
+            combined[entry.Key] += entry.Value;
         }
     }
 
-    return d2;
+    return combined;
 }
+
+var stepCache = new Dictionary<string, Dictionary<char, long>>();
 
 Dictionary<char, long> RecursiveNightmare(int numSteps, char c0, char c1, IReadOnlyDictionary<string, char> mutations)
 {
+    var cacheKey = $"{numSteps}{c0}{c1}";
+
+    if (stepCache.TryGetValue(cacheKey, out var cacheHit))
+    {
+        return cacheHit;
+    }
+
     var interstitialChar = mutations[new string(new ReadOnlySpan<char>(new[] { c0, c1 }))];
 
     if (numSteps == 1)
@@ -33,7 +40,11 @@ Dictionary<char, long> RecursiveNightmare(int numSteps, char c0, char c1, IReadO
     var child0 = RecursiveNightmare(numSteps - 1, c0, interstitialChar, mutations);
     var child1 = RecursiveNightmare(numSteps - 1, interstitialChar, c1, mutations);
 
-    return CombineDicts(child0, child1);
+    var stepResult = CombineDictionaries(child0, child1);
+
+    stepCache.TryAdd(cacheKey, stepResult);
+
+    return stepResult;
 }
 
 if (args.Length != 1)
@@ -59,7 +70,7 @@ for (var i = 2; i < lines.Length; i++)
     mutations.Add(tokens[0], tokens[1][0]);
 }
 
-const int numTransformations = 25;
+const int numTransformations = 40;
 
 var result = new Dictionary<char, long>();
 
@@ -69,10 +80,9 @@ for (var i = 1; i < pattern.Length; i++)
     var c0 = pattern[i - 1];
     var c1 = pattern[i];
     var m = RecursiveNightmare(numTransformations, c0, c1, mutations);
-    result = CombineDicts(result, m);
+    result = CombineDictionaries(result, m);
     sw.Stop();
     Console.WriteLine($"Chunk {i}: {sw.ElapsedMilliseconds} ms");
-    Console.Beep();
 }
 
 result[pattern.Last()]++;
