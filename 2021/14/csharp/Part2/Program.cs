@@ -17,28 +17,29 @@ Dictionary<char, long> CombineDictionaries(IReadOnlyDictionary<char, long> d1, I
 
 var stepCache = new Dictionary<string, Dictionary<char, long>>();
 
-Dictionary<char, long> RecursiveNightmare(int numSteps, char c0, char c1, IReadOnlyDictionary<string, char> mutations)
+Dictionary<char, long> RecursiveNightmare(int numSteps, ReadOnlySpan<char> pattern,
+    IReadOnlyDictionary<string, char> mutations)
 {
-    var cacheKey = $"{numSteps}{c0}{c1}";
+    var cacheKey = $"{numSteps}{pattern}";
 
     if (stepCache.TryGetValue(cacheKey, out var cacheHit))
     {
         return cacheHit;
     }
 
-    var interstitialChar = mutations[new string(new ReadOnlySpan<char>(new[] { c0, c1 }))];
+    var interstitialChar = mutations[new string(pattern)];
 
     if (numSteps == 1)
     {
-        return interstitialChar == c0
-            ? new Dictionary<char, long> { { c0, 2 } }
-            : new Dictionary<char, long> { { c0, 1 }, { interstitialChar, 1 } };
+        return interstitialChar == pattern[0]
+            ? new Dictionary<char, long> { { interstitialChar, 2 } }
+            : new Dictionary<char, long> { { pattern[0], 1 }, { interstitialChar, 1 } };
     }
 
 //    Console.WriteLine($"{c0}{c1} =>  {interstitialChar}");
 
-    var child0 = RecursiveNightmare(numSteps - 1, c0, interstitialChar, mutations);
-    var child1 = RecursiveNightmare(numSteps - 1, interstitialChar, c1, mutations);
+    var child0 = RecursiveNightmare(numSteps - 1, new[] { pattern[0], interstitialChar }, mutations);
+    var child1 = RecursiveNightmare(numSteps - 1, new[] { interstitialChar, pattern[1] }, mutations);
 
     var stepResult = CombineDictionaries(child0, child1);
 
@@ -61,7 +62,7 @@ if (!File.Exists(filePath))
 
 var lines = await File.ReadAllLinesAsync(filePath);
 
-var pattern = lines[0];
+var inputPattern = lines[0];
 
 var mutations = new Dictionary<string, char>();
 for (var i = 2; i < lines.Length; i++)
@@ -74,18 +75,16 @@ const int numTransformations = 40;
 
 var result = new Dictionary<char, long>();
 
-for (var i = 1; i < pattern.Length; i++)
+for (var i = 0; i < inputPattern.Length-1; i++)
 {
     var sw = Stopwatch.StartNew();
-    var c0 = pattern[i - 1];
-    var c1 = pattern[i];
-    var m = RecursiveNightmare(numTransformations, c0, c1, mutations);
+    var m = RecursiveNightmare(numTransformations, inputPattern.Substring(i,2), mutations);
     result = CombineDictionaries(result, m);
     sw.Stop();
     Console.WriteLine($"Chunk {i}: {sw.ElapsedMilliseconds} ms");
 }
 
-result[pattern.Last()]++;
+result[inputPattern.Last()]++;
 
 var orderedResult = result.OrderBy(x => x.Value).ToArray();
 
