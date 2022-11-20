@@ -6,8 +6,30 @@ void Display(int[,] grid, int gridSize)
     {
         for (var x = 0; x < gridSize; x++)
         {
-            var value = grid[x, y] == default ? "_" : grid[x, y].ToString();
-            Console.Write(value);
+            Console.Write(grid[x, y]);
+        }
+
+        Console.Write(Environment.NewLine);
+    }
+    Console.Write(Environment.NewLine);
+}
+
+void Display2(int[,] grid, int gridSize, List<Tuple<int, int>> visited)
+{
+    var sum = -1;
+    for (var y = 0; y < gridSize; y++)
+    {
+        for (var x = 0; x < gridSize; x++)
+        {
+            if (visited.Contains(new Tuple<int, int>(x, y)))
+            {
+                Console.Write(grid[x, y]);
+                sum += grid[x, y];
+            }
+            else
+            {
+                Console.Write(" ");
+            }
         }
 
         Console.Write(Environment.NewLine);
@@ -43,7 +65,6 @@ for (var y = 0; y < inputLineLength; y++)
         var numericValue = (int)char.GetNumericValue(line[x]);
         grid[x, y] = numericValue;
 
-
         for (var zy = 0; zy < multiplier; zy++)
         {
             var yPos = y + (zy * inputLineLength);
@@ -58,7 +79,6 @@ for (var y = 0; y < inputLineLength; y++)
                 grid[xPos, yPos] = zValue;
             }
         }
-
     }
 }
 
@@ -67,7 +87,7 @@ Display(grid, gridSize);
 var destination = new Tuple<int, int>(gridSize - 1, gridSize - 1);
 
 var initialPath = new Path();
-initialPath.Advance(new Tuple<int, int>(0, 0), grid[0, 0]);
+initialPath.Advance(new Tuple<int, int>(0, 0), 0);
 
 var paths = new HashSet<Path> { initialPath };
 var visited = new HashSet<Tuple<int, int>> { initialPath.Position };
@@ -96,8 +116,11 @@ while (true)
         if (candidate.Equals(destination))
         {
             sw.Stop();
+            shortestPath.Advance(candidate, grid[candidate.Item1, candidate.Item2]);
             // we did it!
             Console.WriteLine($"Weight: {shortestPath.Weight}, {sw.ElapsedMilliseconds} ms");
+
+            Display2(grid, gridSize, shortestPath.Visited);
             return;
         }
 
@@ -109,13 +132,18 @@ while (true)
                 // we've already been here, and it was cheaper
                 continue;
             }
-            var newPath = new Path { Position = shortestPath.Position, Weight = shortestPath.Weight };
+
+            var newPath = new Path
+            {
+                Position = shortestPath.Position, 
+                Weight = shortestPath.Weight,
+                Visited = new List<Tuple<int, int>>(shortestPath.Visited)
+            };
             newPath.Advance(candidate, candidateWeight);
             paths.Add(newPath);
         }
         catch (IndexOutOfRangeException)
         {
-            continue;
         }
     }
 }
@@ -126,16 +154,12 @@ public record Path
 
     public Tuple<int, int> Position = null!;
 
+    public List<Tuple<int, int>> Visited = new();
+
     public void Advance(Tuple<int, int> node, int nodeWeight)
     {
         Weight += nodeWeight;
         Position = node;
+        Visited.Add(node);
     }
-
-    /*
-    public Path Clone()
-    {
-        return new Path { Position = Position, Weight = Weight };
-    }
-    */
 }
