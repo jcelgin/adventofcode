@@ -14,29 +14,6 @@ void Display(int[,] grid, int gridSize)
     Console.Write(Environment.NewLine);
 }
 
-void Display2(int[,] grid, int gridSize, List<Tuple<int, int>> visited)
-{
-    var sum = -1;
-    for (var y = 0; y < gridSize; y++)
-    {
-        for (var x = 0; x < gridSize; x++)
-        {
-            if (visited.Contains(new Tuple<int, int>(x, y)))
-            {
-                Console.Write(grid[x, y]);
-                sum += grid[x, y];
-            }
-            else
-            {
-                Console.Write(" ");
-            }
-        }
-
-        Console.Write(Environment.NewLine);
-    }
-    Console.Write(Environment.NewLine);
-}
-
 if (args.Length != 1)
 {
     throw new ArgumentException($"Expected 1 argument (file path), got {args.Length}");
@@ -82,7 +59,7 @@ for (var y = 0; y < inputLineLength; y++)
     }
 }
 
-Display(grid, gridSize);
+//Display(grid, gridSize);
 
 var destination = new Tuple<int, int>(gridSize - 1, gridSize - 1);
 
@@ -119,8 +96,6 @@ while (true)
             shortestPath.Advance(candidate, grid[candidate.Item1, candidate.Item2]);
             // we did it!
             Console.WriteLine($"Weight: {shortestPath.Weight}, {sw.ElapsedMilliseconds} ms");
-
-            Display2(grid, gridSize, shortestPath.Visited);
             return;
         }
 
