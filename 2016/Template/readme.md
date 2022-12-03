@@ -1,4 +1,4 @@
-https://adventofcode.com/2022/day/X
+https://adventofcode.com/2016/day/X
 
 --- Day X ---
 
