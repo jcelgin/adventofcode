@@ -24,7 +24,7 @@ foreach (var line in lines)
 
     // ReSharper disable once ArrangeRedundantParentheses
     total += (2 * tokens[0] * tokens[1]) + (2 * tokens[1] * tokens[2]) + (2 * tokens[0] * tokens[2]);
-    total += (tokens[0] * tokens[1]);
+    total += tokens[0] * tokens[1];
 }
 
 Console.WriteLine($"Result: {total}");
