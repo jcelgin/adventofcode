@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DepthCounter": {
+      "commandName": "Project",
+      "commandLineArgs": "..\\..\\..\\..\\..\\input.test.txt"
+    }
+  }
+}
