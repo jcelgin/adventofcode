@@ -1,4 +1,6 @@
-﻿if (args.Length != 1)
+﻿using Part2;
+
+if (args.Length != 1)
 {
     throw new ArgumentException($"Expected 1 argument (file path), got {args.Length}");
 }
@@ -10,9 +12,6 @@ if (!File.Exists(filePath))
     throw new FileNotFoundException(filePath);
 }
 
-var lines = await File.ReadAllLinesAsync(filePath);
+var input = await File.ReadAllTextAsync(filePath);
 
-// TODO
-var result = "TODO";
-
-Console.WriteLine($"Result: {result}");
+Console.WriteLine($"Result: {NegativeDetectingParenParser.Parse(input)}");
