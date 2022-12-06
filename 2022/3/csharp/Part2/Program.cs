@@ -1,7 +1,6 @@
 ﻿int GetPriorityOf(char a)
 {
-    var val1 = a > 90 ? a - 96 : a - 38;
-    return val1;
+    return a > 90 ? a - 96 : a - 38;
 }
 
 if (args.Length != 1)
