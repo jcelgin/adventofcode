@@ -32,7 +32,7 @@ foreach (var line in lines)
         IsInRange(e2[1], e1[0], e1[1]))
     {
         linesWithOverlap++;
-        Console.WriteLine(line);
+        // Console.WriteLine(line);
     }
 }
 
