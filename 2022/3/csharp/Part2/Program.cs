@@ -20,8 +20,10 @@ var lines = await File.ReadAllLinesAsync(filePath);
 
 const int chunkSize = 3;
 
-var totalPriority = lines.Chunk(chunkSize)
-    .Select(chunk => chunk[0].Intersect(chunk[1]).Intersect(chunk[2]))
+var totalPriority = lines
+    .Select(x => x.ToCharArray())
+    .Chunk(chunkSize)
+    .Select(x => x.Aggregate(Array.Empty<char>(), (s, s1) => !s.Any() ? s1 : s.Intersect(s1).ToArray()))
     .Select(intersection => GetPriorityOf(intersection.Single()))
     .Sum();
 
