@@ -10,9 +10,16 @@ if (!File.Exists(filePath))
     throw new FileNotFoundException(filePath);
 }
 
-var lines = await File.ReadAllLinesAsync(filePath);
+var input = await File.ReadAllTextAsync(filePath);
 
-// TODO
-var result = "TODO";
-
-Console.WriteLine($"Result: {result}");
+const int numChars = 4;
+for (var i = 0; i < input.Length; i++)
+{
+    var end = i + numChars;
+    var charCount = input[i..end].ToHashSet().Count;
+    if (charCount == numChars)
+    {
+        Console.WriteLine($"Result: {end}");
+        return;
+    }
+}
