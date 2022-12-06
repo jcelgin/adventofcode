@@ -2,7 +2,7 @@
   "profiles": {
     "DepthCounter": {
       "commandName": "Project",
-      "commandLineArgs": "..\\..\\..\\..\\..\\input.test.txt"
+      "commandLineArgs": "..\\..\\..\\..\\..\\input.real.txt"
     }
   }
 }
