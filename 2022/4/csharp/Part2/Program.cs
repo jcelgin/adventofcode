@@ -23,7 +23,7 @@ foreach (var line in lines)
     var e1 = elfLoad[0];
     var e2 = elfLoad[1];
 
-    var r1 = Enumerable.Range(e1[0], e1[1] - e1[0] + 1);
+    var r1 = Enumerable.Range(e1[0], e1[1] - e1[0] + 1).ToHashSet();
 
     if (r1.Contains(e2[0]) || r1.Contains(e2[1]))
     {
@@ -32,7 +32,7 @@ foreach (var line in lines)
         continue;
     }
 
-    var r2 = Enumerable.Range(e2[0], e2[1] - e2[0] + 1);
+    var r2 = Enumerable.Range(e2[0], e2[1] - e2[0] + 1).ToHashSet();
     if (r2.Contains(e1[0]) || r2.Contains(e1[1]))
     {
         linesWithOverlap++;
